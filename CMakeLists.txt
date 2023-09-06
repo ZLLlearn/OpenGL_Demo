@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.0)
 # set(变量 文件名/路径/...)
 # set(Source_one src/main.cpp)
 # ${PROJECT_NAME}：本CMakeLists.txt的project名称
-set(PROJECT_NAME OpenGl_DEMO)
+set(PROJECT_NAME OpenGl_Demo)
 
 # project命令用于指定cmake工程的名称，它还可以指定cmake工程的版本号（VERSION关键字）、简短的描述（DESCRIPTION关键字）、主页URL（HOMEPAGE_URL关键字）和编译工程使用的语言（LANGUAGES关键字）
 # project(<PROJECT-NAME> [<language-name>...])
@@ -26,7 +26,7 @@ include_directories(${PROJECT_SOURCE_DIR}/3rdParty/include
 # )
 
 file(
-    GLOB SOURCES
+    GLOB_RECURSE SOURCES
     ${PROJECT_SOURCE_DIR}/3rdParty/*.c
     ${PROJECT_SOURCE_DIR}/src/*.cpp
 )
@@ -38,7 +38,7 @@ file(
 
 # 获取路径下所有的.cpp/.c/.cc文件（不包括子目录），并赋值给变量
 # aux_source_directory(路径 变量)
-aux_source_directory(src DIR_SRCS)
+# aux_source_directory(src DIR_SRCS)
 
 # 给编译器添加库目录
 link_directories(3rdParty/lib)
@@ -48,9 +48,6 @@ link_directories(3rdParty/lib)
 # add_definitions(-DFOO -DBAR ...)
 # add_compile_definitions定义宏，这种方式可以给宏具体值，但是这个指令只要高版本的cmake支持 等价C语言中 #define  MG_ENABLE_OPENSSL   1
 # add_compile_definitions(MG_ENABLE_OPENSSL=1)
-
-# 打印消息
-message("CMake Test Succeed!")
 
 # 编译子文件夹的CMakeLists.txt，父目录必须
 # add_subdirectory(子文件夹名称)
@@ -70,3 +67,6 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 # 注意，库文件名称通常为libxxx.so，在这里只要写xxx即可
 # target_link_libraries(库文件名称/可执行文件名称 链接的库文件名称)
 target_link_libraries(${PROJECT_NAME} opengl32.a glfw3.a)
+
+# 打印消息
+message("CMake Succeed!")
