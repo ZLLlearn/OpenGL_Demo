@@ -4,6 +4,7 @@
 #include "GLFW/glfw3.h"
 
 #include "displayWindow.h"
+#include "camera.h"
 
 
 BaseWindow::BaseWindow(const std::string& name) : m_name(name) {}
@@ -18,7 +19,7 @@ public:
 
     void setWindowSize(uint16_t width, uint16_t height) override;
     void activateContext() override;
-    void processInput() override;
+    void processInput(InputManager&) override;
     bool paint() override;
     void setState(StateType type, uint32_t targetVal) override;
 
@@ -54,14 +55,9 @@ void OpenGLWindow::activateContext() {
     }
 }
 
-void OpenGLWindow::processInput() {
-    switch (glfwGetKey(m_window, GLFW_KEY_ESCAPE))
-    {
-    case GLFW_PRESS:
+void OpenGLWindow::processInput(InputManager&) {
+    if (glfwGetKey(m_window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         closeWindow = true;
-        break;
-    default:
-        break;
     }
 }
 

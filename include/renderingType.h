@@ -10,5 +10,19 @@ enum class StateType {
     BackColor,
 };
 
+enum class CameraType {
+    Ortho,
+    Perspective,
+};
+
+enum class MoveDirection {
+    Forward,
+    Backward,
+    Leftward,
+    Rightward,
+    Upward,
+    Downward,
+    Reset,
+};
 
 #endif

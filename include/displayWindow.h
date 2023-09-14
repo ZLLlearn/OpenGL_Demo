@@ -7,7 +7,7 @@
 #include <vector>
 #include "renderingType.h"
 
-
+class InputManager;
 class BaseWindow {
 public:
     explicit BaseWindow(const std::string& name);
@@ -15,7 +15,7 @@ public:
 
     virtual void setWindowSize(uint16_t width, uint16_t height) = 0;
     virtual void activateContext() = 0;
-    virtual void processInput() = 0;
+    virtual void processInput(InputManager&) = 0;
     virtual bool paint() = 0;
     virtual void setState(StateType type, uint32_t targetVal) = 0;
 
