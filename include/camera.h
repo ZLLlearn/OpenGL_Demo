@@ -8,18 +8,21 @@
 
 class Camera {
 public:
-    explicit Camera(CameraType type = CameraType::Perspective);
+    Camera(CameraType type = CameraType::Perspective, glm::vec3 position);
     ~Camera() = default;
 
     const glm::mat4& getViewMatrix() const;
     const glm::mat4& getProjMatrix() const;
 
+    void fitView(float width, float height);
     void pointRotate(float xoffset, float yoffset);
-    void updateCameraParameters();
-    void updateCameraPosition(MoveDirection direction, float offset);
+    void updatePosition(MoveDirection direction, float offset);
+    void updateEuler(double xOffset, double yOffset);
+    void updateZoomScale(double offset);
 
 private:
-    void updateZoomScale(float offset);
+    void initParameters();
+    void updateParameters();
     void updateMatrix();
 
     CameraType camera_type;
@@ -32,17 +35,19 @@ private:
     glm::mat4 viewMatrix {1.0f};
     glm::mat4 projMatrix {1.0f};
 
-    float camera_fov {};
-    float near_plane {};
-    float far_plane {};
-    float left_border {};
-    float right_border {};
-    float top_border {};
-    float bottom_board {};
+    float camera_fov {45.0f};
+    float nearPlane {0.1f};
+    float farPlane {500.0f};
+    float leftBorder {};
+    float rightBorder {};
+    float topBorder {};
+    float bottomBoard {};
 
-    float mouse_zoom {1.0f};
+    float camera_yaw{-90.0f};
+    float camera_pitch{0.0f};
+
+    float camera_zoom {1.0f};
     glm::vec3 mouse_position {};
-    std::shared_ptr<Camera> originCamere;
 
 };
 

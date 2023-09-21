@@ -2,8 +2,8 @@
 #include "camera.h"
 
 
-Camera::Camera(CameraType type) : camera_type(type), camera_position(0.0f, 0.0f, 1.0f), camera_target(0.0f, 0.0f, 0.0f), camera_up(0.0f, 1.0f, 0.0f) {
-    
+Camera::Camera(CameraType type, glm::vec3 position) : camera_type(type), camera_position(std::move(position)) {
+    initParameters();
 }
 
 const glm::mat4& Camera::getViewMatrix() const {
@@ -12,6 +12,12 @@ const glm::mat4& Camera::getViewMatrix() const {
 
 const glm::mat4& Camera::getProjMatrix() const {
     return projMatrix;
+}
+
+void Camera::fitView(float width, float height) {
+    bottomBoard = topBorder = width;
+    rightBorder = leftBorder = height;
+    updateMatrix();
 }
 
 void Camera::pointRotate(float xoffset, float yoffset) {
@@ -29,12 +35,7 @@ void Camera::pointRotate(float xoffset, float yoffset) {
     //camera_up = glm::normalize(glm::cross(camera_front, camera_right));
 }
 
-void Camera::updateCameraParameters() {
-    camera_front = glm::normalize(camera_target - camera_position);
-    camera_right = glm::normalize(glm::cross(camera_front, camera_up));
-}
-
-void Camera::updateCameraPosition(MoveDirection direction, float offset) {
+void Camera::updatePosition(MoveDirection direction, float offset) {
     switch (direction)
     {
     case MoveDirection::Forward:
@@ -56,14 +57,39 @@ void Camera::updateCameraPosition(MoveDirection direction, float offset) {
         camera_position -= camera_up * offset;
         break;
     case MoveDirection::Reset:
-        camera_position = originCamere->camera_position;
+        initParameters();
         break;
     default:
         break;
     }
+    
+    camera_target = camera_position + camera_front;
+    updateMatrix();
 }
 
-void Camera::updateZoomScale(float offset) {
+void Camera::updateEuler(double xOffset, double yOffset) {
+    float sensitivity = 0.08f;
+    camera_yaw += xOffset * sensitivity;
+    camera_pitch += yOffset * sensitivity;
+
+    if (camera_pitch > 89.0f) {
+        camera_pitch = 89.0f;
+    }
+    if (camera_pitch < -89.0f) {
+        camera_pitch = -89.0f;
+    }
+    glm::vec3 front;
+    front.x = cos(glm::radians(camera_yaw) * cos(glm::radians(camera_pitch)));
+    front.y = sin(glm::radians(camera_pitch));
+    front.z = sin(glm::radians(camera_yaw)) * cos(glm::radians(camera_pitch));
+    camera_front = glm::normalize(front);
+    camera_right = glm::normalize(glm::cross(camera_front, glm::vec3(0.0f, 1.0f, 0.0f)));
+    camera_up = glm::normalize(glm::cross(camera_right, camera_front));
+    camera_target = camera_front + camera_position;
+    updateMatrix();
+}
+
+void Camera::updateZoomScale(double offset) {
     camera_fov += offset;
     if (camera_fov < 1.0f) {
         camera_fov = 1.0f;
@@ -71,15 +97,31 @@ void Camera::updateZoomScale(float offset) {
     else if (camera_fov > 45.0f) {
         camera_fov = 45.0f;
     }
+    updateMatrix();
+}
+
+void Camera::initParameters() {
+    camera_position = glm::vec3(0.0f, 0.0f, 10.0f);
+    camera_target = glm::vec3(0.0f, 0.0f, 0.0f);
+    camera_up = glm::vec3(0.0f, 1.0f, 0.0f);
+    camera_front = glm::normalize(camera_target - camera_position);
+    camera_right = glm::normalize(glm::cross(camera_front, camera_up));
+    camera_fov = 45.0f;
+    camera_yaw = -90.0f;
+    camera_pitch = 0.0f;
+}
+
+void Camera::updateParameters() {
+
 }
 
 void Camera::updateMatrix() {
     viewMatrix = glm::lookAt(camera_position, camera_target, camera_up);
     if (camera_type == CameraType::Ortho) {
-        projMatrix = glm::ortho(left_border, right_border, bottom_board, top_border, near_plane, far_plane);
+        projMatrix = glm::ortho(leftBorder, rightBorder, bottomBoard, topBorder, nearPlane, farPlane);
     }
     else {
-        projMatrix = glm::perspective(glm::radians(camera_fov), top_border / left_border, near_plane, far_plane);
+        projMatrix = glm::perspective(glm::radians(camera_fov), topBorder / leftBorder, nearPlane, farPlane);
     }
 }
 

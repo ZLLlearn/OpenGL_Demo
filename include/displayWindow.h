@@ -1,7 +1,5 @@
 #ifndef DISPLAYWINDOW_H
 #define DISPLAYWINDOW_H
-
-
 #include <memory>
 #include <string>
 #include <vector>

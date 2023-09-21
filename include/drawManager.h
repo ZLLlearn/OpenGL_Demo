@@ -7,9 +7,9 @@ public:
     static DrawManager& getDrawManager();
 
     uint32_t initVAO() const;
-    void drawTriangle(uint32_t id);
-    void drawCube(uint32_t id);
-
+    void drawTriangle(uint32_t& id);
+    void drawCube(uint32_t& id);
+    void drawSphere(uint32_t& id);
 
 private:
     DrawManager() = default;
@@ -17,6 +17,7 @@ private:
 
     DrawManager(const DrawManager& other) = delete;
     DrawManager& operator=(const DrawManager& other) = delete;
+    
     std::vector<uint32_t> vaoIds;
     std::vector<uint32_t> vboIds;
 };
