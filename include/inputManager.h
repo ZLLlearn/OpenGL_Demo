@@ -81,6 +81,8 @@ public:
     void setMouseZoom(double wheelDelta);
     void updateCamera();
 
+    const double getCurrentFrame() const;
+
 private:
     InputManager();
     ~InputManager() = default;

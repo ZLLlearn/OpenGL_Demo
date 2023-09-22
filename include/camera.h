@@ -8,9 +8,10 @@
 
 class Camera {
 public:
-    Camera(CameraType type = CameraType::Perspective, glm::vec3 position);
+    Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 10.0f), CameraType type = CameraType::Perspective);
     ~Camera() = default;
 
+    const glm::vec3& getPosition() const;
     const glm::mat4& getViewMatrix() const;
     const glm::mat4& getProjMatrix() const;
 

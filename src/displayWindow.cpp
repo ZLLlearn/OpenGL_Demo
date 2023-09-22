@@ -135,6 +135,7 @@ bool OpenGLWindow::paint() {
     if (closeWindow || glfwWindowShouldClose(m_window)) {
         return false;
     }
+    glEnable(GL_DEPTH_TEST);
 
     glfwSwapBuffers(m_window);
     glfwPollEvents();
@@ -156,7 +157,7 @@ void OpenGLWindow::setState(StateType type, uint32_t targetVal) {
 
 void OpenGLWindow::setColor(uint32_t color) {
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 

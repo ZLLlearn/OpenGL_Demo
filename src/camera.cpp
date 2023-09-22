@@ -2,8 +2,12 @@
 #include "camera.h"
 
 
-Camera::Camera(CameraType type, glm::vec3 position) : camera_type(type), camera_position(std::move(position)) {
+Camera::Camera(glm::vec3 position, CameraType type) : camera_position(std::move(position)), camera_type(type) {
     initParameters();
+}
+
+const glm::vec3& Camera::getPosition() const {
+    return camera_position;
 }
 
 const glm::mat4& Camera::getViewMatrix() const {

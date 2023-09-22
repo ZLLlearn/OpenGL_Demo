@@ -80,7 +80,7 @@ void InputManager::updateCamera() {
 }
 
 void InputManager::keyEvent() {
-    float speed = 0.5;
+    float speed = 2.0;
     double deltaTime = m_frame - m_preFrame;
     if (m_keyInput->mode.isShiftPressed) {
         speed *= 10;
@@ -134,3 +134,6 @@ void InputManager::mouseEvent() {
     }
 }
 
+const double InputManager::getCurrentFrame() const {
+    return m_frame;
+}
