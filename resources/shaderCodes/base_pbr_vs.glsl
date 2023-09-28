@@ -15,8 +15,8 @@ uniform mat3 normalMatrix;
 
 void main () {
     pTexCoord = vTexCoord;
-    worldPos = vec3(model * vec4(vPosition, 1.0f));
+    worldPos = vec3(model * vec4(vPosition, 1.0));
     pNormal = normalMatrix * vNormal;
 
-    gl_Position = proj * view * vec4(worldPos, 1.0f);
+    gl_Position = proj * view * vec4(worldPos, 1.0);
 }

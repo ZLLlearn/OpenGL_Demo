@@ -17,6 +17,8 @@ public:
     ~OpenGLWindow();
 
     void setWindowSize(uint16_t width, uint16_t height) override;
+    uint32_t getWindowWidth() override;
+    uint32_t getWindowHeight() override;
     void activateContext() override;
     void processInput(InputManager&) override;
     bool paint() override;
@@ -24,6 +26,7 @@ public:
 
 private:
     void setColor(uint32_t color);
+    void setBuffer();
 
     static int s_width, s_height;
     static bool s_hasMouseInput, s_hasWheelInput;
@@ -68,6 +71,14 @@ OpenGLWindow::~OpenGLWindow() {
 
 void OpenGLWindow::setWindowSize(uint16_t width, uint16_t height) {
     glViewport(0, 0, width, height);
+}
+
+uint32_t OpenGLWindow::getWindowWidth() {
+    return s_width;
+}
+
+uint32_t OpenGLWindow::getWindowHeight() {
+    return s_height;
 }
 
 void OpenGLWindow::activateContext() {
@@ -146,18 +157,23 @@ bool OpenGLWindow::paint() {
 void OpenGLWindow::setState(StateType type, uint32_t targetVal) {
     switch (type)
     {
+    case StateType::Buffer:
+        setBuffer();
+        break;
     case StateType::BackColor:
         setColor(targetVal);
         break;
-    
     default:
         break;
     }
 }
 
+void OpenGLWindow::setBuffer() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
 void OpenGLWindow::setColor(uint32_t color) {
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 

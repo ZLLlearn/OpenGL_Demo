@@ -7,6 +7,7 @@ enum class GraphicsAPI {
 };
 
 enum class StateType {
+    Buffer,
     BackColor,
 };
 
@@ -23,6 +24,16 @@ enum class MoveDirection {
     Upward,
     Downward,
     Reset,
+};
+
+enum class TextureType {
+    _2D,
+    Cube,
+};
+
+enum class FrameAttachmentType {
+    Texture,
+    RenderBuffer,
 };
 
 #endif

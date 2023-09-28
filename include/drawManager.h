@@ -8,6 +8,7 @@ public:
 
     uint32_t initVAO() const;
     void drawTriangle(uint32_t& id);
+    void drawQuad(uint32_t& id);
     void drawCube(uint32_t& id);
     void drawSphere(uint32_t& id);
 

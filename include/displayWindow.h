@@ -12,6 +12,8 @@ public:
     virtual ~BaseWindow() = 0;
 
     virtual void setWindowSize(uint16_t width, uint16_t height) = 0;
+    virtual uint32_t getWindowWidth() = 0;
+    virtual uint32_t getWindowHeight() = 0;
     virtual void activateContext() = 0;
     virtual void processInput(InputManager&) = 0;
     virtual bool paint() = 0;
