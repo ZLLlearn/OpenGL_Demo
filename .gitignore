@@ -2,7 +2,7 @@
 *~
 
 # 忽略json配置文件
-/.vscode
+.vscode/
 
 # 忽略编译结果
 /build
