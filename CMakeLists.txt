@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.0)
 # set(变量 文件名/路径/...)
 # set(Source_one src/main.cpp)
 # ${PROJECT_NAME}：本CMakeLists.txt的project名称
-set(PROJECT_NAME OpenGl_Demo)
+set(PROJECT_NAME PBR_Demo)
 
 # project命令用于指定cmake工程的名称，它还可以指定cmake工程的版本号（VERSION关键字）、简短的描述（DESCRIPTION关键字）、主页URL（HOMEPAGE_URL关键字）和编译工程使用的语言（LANGUAGES关键字）
 # project(<PROJECT-NAME> [<language-name>...])

@@ -10,8 +10,8 @@ uniform vec3 albedo;
 uniform float metallic;
 uniform float roughness;
 uniform float ao;
-uniform vec3 lightPositions;
-uniform vec3 lightColors;
+uniform vec3 lightPosition;
+uniform vec3 lightColor;
 uniform vec3 cameraPos;
 uniform samplerCube irradianceMap;
 uniform samplerCube prefilterMap;
@@ -68,11 +68,11 @@ void main() {
 
     vec3 Lo = vec3(0.0);
     {
-        vec3 L = normalize(lightPositions - worldPos);
+        vec3 L = normalize(lightPosition - worldPos);
         vec3 H = normalize(V + L);
-        float distance = length(lightPositions - worldPos);
+        float distance = length(lightPosition - worldPos);
         float attenuation = 1.0 / (distance * distance);
-        vec3 radiance = lightColors * attenuation;
+        vec3 radiance = lightColor * attenuation;
 
         float ndf = distributionGGX(N, H, roughness);
         float geometry = geometrySmithG2(N, V, L, roughness);
@@ -86,7 +86,7 @@ void main() {
         kd *= 1.0 - metallic;
 
         float NdotL = max(dot(N, L), 0.0);
-        Lo = (kd * albedo / PI + specular) * radiance * NdotL;
+        Lo += (kd * albedo / PI + specular) * radiance * NdotL;
     }
 
     vec3 fresnel = fresnelSchlick(clamp(dot(N, V), 0.0, 1.0), F0);

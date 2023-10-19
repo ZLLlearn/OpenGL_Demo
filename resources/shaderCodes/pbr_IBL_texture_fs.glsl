@@ -6,9 +6,8 @@ in vec3 pNormal;
 
 out vec4 FragColor;
 
-
-uniform vec3 lightPositions;
-uniform vec3 lightColors;
+uniform vec3 lightPosition;
+uniform vec3 lightColor;
 uniform vec3 cameraPos;
 uniform sampler2D albedoMap;
 uniform sampler2D normalMap;
@@ -82,7 +81,7 @@ void main() {
     float roughness = texture(roughnessMap, pTexCoord).r;
     float ao = texture(aoMap, pTexCoord).r;
 
-    vec3 N = normalize(pNormal);
+    vec3 N = getNormalFromMap();
     vec3 V = normalize(cameraPos - worldPos);
     vec3 R = reflect(-V, N);
 
@@ -91,15 +90,15 @@ void main() {
 
     vec3 Lo = vec3(0.0);
     {
-        vec3 L = normalize(lightPositions - worldPos);
+        vec3 L = normalize(lightPosition - worldPos);
         vec3 H = normalize(V + L);
-        float distance = length(lightPositions - worldPos);
+        float distance = length(lightPosition - worldPos);
         float attenuation = 1.0 / (distance * distance);
-        vec3 radiance = lightColors * attenuation;
+        vec3 radiance = lightColor * attenuation;
 
         float ndf = distributionGGX(N, H, roughness);
         float geometry = geometrySmithG2(N, V, L, roughness);
-        vec3 fresnel = fresnelSchlick(clamp(dot(H, V), 0.0, 1.0), F0);
+        vec3 fresnel = fresnelSchlickRoughness(clamp(dot(H, V), 0.0, 1.0), F0, roughness);
 
         vec3 numerator = ndf * geometry * fresnel;
         float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001;
@@ -109,10 +108,10 @@ void main() {
         kd *= 1.0 - metallic;
 
         float NdotL = max(dot(N, L), 0.0);
-        Lo = (kd * albedo / PI + specular) * radiance * NdotL;
+        Lo += (kd * albedo / PI + specular) * radiance * NdotL;
     }
 
-    vec3 fresnel = fresnelSchlick(clamp(dot(N, V), 0.0, 1.0), F0);
+    vec3 fresnel = fresnelSchlickRoughness(clamp(dot(N, V), 0.0, 1.0), F0, roughness);
     vec3 kd = 1.0 - fresnel;
     kd *= 1.0 - metallic;
 

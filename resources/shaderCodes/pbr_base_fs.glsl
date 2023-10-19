@@ -10,8 +10,8 @@ uniform vec3 albedo;
 uniform float metallic;
 uniform float roughness;
 uniform float ao;
-uniform vec3 lightPositions;
-uniform vec3 lightColors;
+uniform vec3 lightPosition;
+uniform vec3 lightColor;
 uniform vec3 cameraPos;
 
 const float PI = 3.14159265359;
@@ -58,11 +58,11 @@ void main() {
     vec3 F0 = vec3(0.04);
     F0 = mix(F0, albedo, metallic);
 
-    vec3 L = normalize(lightPositions - worldPos);
+    vec3 L = normalize(lightPosition - worldPos);
     vec3 H = normalize(V + L);
-    float distance = length(lightPositions - worldPos);
+    float distance = length(lightPosition - worldPos);
     float attenuation = 1.0 / (distance * distance);
-    vec3 radiance = lightColors * attenuation;
+    vec3 radiance = lightColor * attenuation;
 
     float ndf = distributionGGX(N, H, roughness);
     float geometry = geometrySmithG2(N, V, L, roughness);

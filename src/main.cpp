@@ -1,8 +1,5 @@
 #include <iostream>
 #include <math.h>
-#include "stb_image.h"
-#include "glad/glad.h"
-#include "GLFW/glfw3.h"
 #include "displayWindow.h"
 #include "shader.h"
 #include "drawManager.h"
@@ -13,22 +10,10 @@
 
 int main() 
 {
-    const uint32_t windowWidth = 1200, windowHeight = 900;
     displayWindowFactory windowFactory;
+    const uint32_t windowWidth = 1200, windowHeight = 900;
     auto mainWindow = windowFactory.createDisplayWindow("main window", windowWidth, windowHeight);
     mainWindow->activateContext();
-
-    Shader base_2DShader("resources/shaderCodes/base_2D_vs.glsl", "resources/shaderCodes/base_2D_fs.glsl");
-    Shader base_3DShader("resources/shaderCodes/base_3D_vs.glsl", "resources/shaderCodes/base_3D_fs.glsl");
-    Shader texture_2DShader("resources/shaderCodes/texture_2D_vs.glsl", "resources/shaderCodes/texture_2D_fs.glsl");
-    Shader base_pbrShader("resources/shaderCodes/base_pbr_vs.glsl", "resources/shaderCodes/base_pbr_fs.glsl");
-    Shader IBL_pbrShader("resources/shaderCodes/base_pbr_vs.glsl", "resources/shaderCodes/IBL_pbr_fs.glsl");
-    Shader IBLTexture_pbrShader("resources/shaderCodes/base_pbr_vs.glsl", "resources/shaderCodes/IBL_texture_pbr_fs.glsl");
-    Shader equirectanglarToCubemapShader("resources/shaderCodes/cubemap_vs.glsl", "resources/shaderCodes/equirectangularToCubemap_fs.glsl");
-    Shader irradianceShader("resources/shaderCodes/cubemap_vs.glsl", "resources/shaderCodes/irradianceConvolution_fs.glsl");
-    Shader prefilterShader("resources/shaderCodes/cubemap_vs.glsl", "resources/shaderCodes/prefilter_fs.glsl");
-    Shader brdfShader("resources/shaderCodes/brdf_vs.glsl", "resources/shaderCodes/brdf_fs.glsl");
-    Shader backgroundShader("resources/shaderCodes/background_vs.glsl", "resources/shaderCodes/background_fs.glsl");
 
     auto& drawManager = DrawManager::getDrawManager();
     auto trangleVao = drawManager.initVAO();
@@ -54,8 +39,20 @@ int main()
         glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
     };
 
-    texture_2DShader.setInt("texture2D", 0);
+    Shader base_2DShader("resources/shaderCodes/2D_base_vs.glsl", "resources/shaderCodes/2D_base_fs.glsl");
+    Shader base_3DShader("resources/shaderCodes/3D_base_vs.glsl", "resources/shaderCodes/3D_base_fs.glsl");
+    Shader texture_2DShader("resources/shaderCodes/2D_texture_vs.glsl", "resources/shaderCodes/2D_texture_fs.glsl");
+    Shader base_pbrShader("resources/shaderCodes/pbr_base_vs.glsl", "resources/shaderCodes/pbr_base_fs.glsl");
+    Shader IBL_pbrShader("resources/shaderCodes/pbr_base_vs.glsl", "resources/shaderCodes/pbr_IBL_fs.glsl");
+    Shader IBLTexture_pbrShader("resources/shaderCodes/pbr_base_vs.glsl", "resources/shaderCodes/pbr_IBL_texture_fs.glsl");
+    Shader equirectanglarToCubemapShader("resources/shaderCodes/cubemap_vs.glsl", "resources/shaderCodes/equirectangularToCubemap_fs.glsl");
+    Shader irradianceShader("resources/shaderCodes/cubemap_vs.glsl", "resources/shaderCodes/irradianceConvolution_fs.glsl");
+    Shader prefilterShader("resources/shaderCodes/cubemap_vs.glsl", "resources/shaderCodes/prefilter_fs.glsl");
+    Shader brdfShader("resources/shaderCodes/brdf_vs.glsl", "resources/shaderCodes/brdf_fs.glsl");
+    Shader backgroundShader("resources/shaderCodes/background_vs.glsl", "resources/shaderCodes/background_fs.glsl");
 
+    texture_2DShader.activate();
+    texture_2DShader.setInt("texture2D", 0);
     base_pbrShader.activate();
     base_pbrShader.setVec("albedo", 0.5f, 0.0f, 0.0f);
     base_pbrShader.setFloat("ao", 1.0f);
@@ -66,8 +63,6 @@ int main()
     IBL_pbrShader.setInt("prefilterMap", 1);
     IBL_pbrShader.setInt("brdfLUT", 2);
     IBLTexture_pbrShader.activate();
-    //IBLTexture_pbrShader.setVec("albedo", 0.5f, 0.0f, 0.0f);
-    //IBLTexture_pbrShader.setFloat("ao", 1.0f);
     IBLTexture_pbrShader.setInt("irradianceMap", 0);
     IBLTexture_pbrShader.setInt("prefilterMap", 1);
     IBLTexture_pbrShader.setInt("brdfLUT", 2);
@@ -76,7 +71,6 @@ int main()
     IBLTexture_pbrShader.setInt("metallicMap", 5);
     IBLTexture_pbrShader.setInt("roughnessMap", 6);
     IBLTexture_pbrShader.setInt("aoMap", 7);
-
     backgroundShader.activate();
     backgroundShader.setInt("environmentMap", 0);
 
@@ -87,7 +81,15 @@ int main()
     captureFbo.genAttachmentR(rbo);
 
     Texture hdrTexture;
-    hdrTexture.loadTexture("resources/textures/industrial_sunset_02_16k.hdr");
+    hdrTexture.loadTexture("resources/textures/industrial_sunset_02_16k.hdr", false);
+    Texture envCubemap(TextureType::Cube);
+    envCubemap.genTexture(512, 512, true);
+    Texture irradianceMap(TextureType::Cube);
+    irradianceMap.genTexture(32, 32);
+    Texture prefilterMap(TextureType::Cube);
+    prefilterMap.genTexture(128, 128, true);
+    Texture brdfLUTTexture;
+    brdfLUTTexture.genTexture(512, 512, false, 2);
 
     Texture albedo_titanium;
     albedo_titanium.loadTexture("resources/textures/Titanium-Scuffed_basecolor.png");
@@ -99,9 +101,6 @@ int main()
     roughness_titanium.loadTexture("resources/textures/Titanium-Scuffed_roughness.png");
     Texture ao_titanium;
     ao_titanium.loadTexture("resources/textures/worn-shiny-metal-ao.png");
-
-    Texture envCubemap(TextureType::Cube);
-    envCubemap.genTexture(512, 512, nullptr, true, true);
 
     equirectanglarToCubemapShader.activate();
     equirectanglarToCubemapShader.setInt("equirectangularMap", 0);
@@ -118,9 +117,6 @@ int main()
 
         drawManager.drawCube(cubeVao);
     }
-
-    Texture irradianceMap(TextureType::Cube);
-    irradianceMap.genTexture(32, 32);
 
     captureFbo.activate();
     captureFbo.setRenderbufferSize(rbo, 32, 32);
@@ -139,9 +135,6 @@ int main()
 
         drawManager.drawCube(cubeVao);
     }
-
-    Texture prefilterMap(TextureType::Cube);
-    prefilterMap.genTexture(128, 128, nullptr, true, true);
 
     prefilterShader.activate();
     prefilterShader.setInt("environmentMap", 0);
@@ -167,9 +160,6 @@ int main()
         }
     }
 
-    Texture brdfLUTTexture;
-    brdfLUTTexture.genTexture(512, 512, nullptr, false, false);
-
     captureFbo.activate();
     captureFbo.setRenderbufferSize(rbo, 512, 512);
     captureFbo.genAttachmentT(TextureType::_2D, brdfLUTTexture.getId());
@@ -187,6 +177,9 @@ int main()
     backgroundShader.setMat("proj", mCamera->getProjMatrix());
 
     mainWindow->setWindowSize(windowWidth, windowHeight);
+
+    Shader* curPBRShader = nullptr;
+    curPBRShader = &IBLTexture_pbrShader;
 
     while (mainWindow->paint()) {
         mainWindow->processInput(inputManager);
@@ -206,13 +199,19 @@ int main()
         //texture_2DShader.activate();
         //brdfLUTTexture.activate(0);
         //drawManager.drawQuad(quadVao);
+        //continue;
+
+        auto timeFactor = inputManager.getCurrentFrame();
+        glm::vec3 newPos = glm::vec3(sin(timeFactor) * 5.0f, sin(timeFactor / 2.0f) * 5.0f, 10.0f);
+        curPBRShader->activate();
+        curPBRShader->setVec("lightPosition", newPos);
+        curPBRShader->setVec("lightColor", 300.0f, 300.0f, 300.0f);
 
         auto& view = mCamera->getViewMatrix();
         auto& proj = mCamera->getProjMatrix();
-        IBL_pbrShader.activate();
-        IBL_pbrShader.setMat("view", view);
-        IBL_pbrShader.setMat("proj", proj);
-        IBL_pbrShader.setVec("cameraPos", mCamera->getPosition());
+        curPBRShader->setMat("view", view);
+        curPBRShader->setMat("proj", proj);
+        curPBRShader->setVec("cameraPos", mCamera->getPosition());
 
         irradianceMap.activate(0);
         prefilterMap.activate(1);
@@ -225,28 +224,26 @@ int main()
 
         auto model = glm::mat4(1.0f);
         for (int row = 0; row < rows; ++row) {
-            IBL_pbrShader.setFloat("metallic", static_cast<float>(row) / static_cast<float>(rows));
+            curPBRShader->setFloat("metallic", static_cast<float>(row) / static_cast<float>(rows));
             for (int column = 0; column < columns; ++column) {
-                IBL_pbrShader.setFloat("roughness", glm::clamp(static_cast<float>(column) / static_cast<float>(columns), 0.05f, 1.0f));
+                curPBRShader->setFloat("roughness", glm::clamp(static_cast<float>(column) / static_cast<float>(columns), 0.05f, 1.0f));
 
                 model = glm::mat4(1.0f);
                 model = glm::translate(model, glm::vec3((column - (columns / 2)) * spacing, (row - (rows / 2)) * spacing, 0.0f));
-                IBL_pbrShader.setMat("model", model);
-                IBL_pbrShader.setMat("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
+                curPBRShader->setMat("model", model);
+                curPBRShader->setMat("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
                 drawManager.drawSphere(sphereVao);
             }
         }
 
-        auto timeFactor = inputManager.getCurrentFrame();
-        glm::vec3 newPos = glm::vec3(sin(timeFactor) * 5.0f, sin(timeFactor / 2.0f) * 5.0f, 10.0f);
-        IBL_pbrShader.setVec("lightPositions", newPos);
-        IBL_pbrShader.setVec("lightColors", 300.0f, 300.0f, 300.0f);
-
         model = glm::mat4(1.0f);
         model = glm::translate(model, newPos);
         model = glm::scale(model, glm::vec3(0.2f));
-        IBL_pbrShader.setMat("model", model);
-        IBL_pbrShader.setMat("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
+        base_3DShader.activate();
+        base_3DShader.setMat("model", model);
+        base_3DShader.setMat("view", view);
+        base_3DShader.setMat("proj", proj);
+        base_3DShader.setVec("objectColor", glm::vec3(1.0f, 1.0f, 1.0f));
         drawManager.drawSphere(sphereVao);
 
         backgroundShader.activate();
