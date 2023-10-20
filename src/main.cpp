@@ -53,6 +53,15 @@ int main()
 
     texture_2DShader.activate();
     texture_2DShader.setInt("texture2D", 0);
+    equirectanglarToCubemapShader.activate();
+    equirectanglarToCubemapShader.setInt("equirectangularMap", 0);
+    equirectanglarToCubemapShader.setMat("proj", captureProjection);
+    irradianceShader.activate();
+    irradianceShader.setInt("environmentMap", 0);
+    irradianceShader.setMat("proj", captureProjection);
+    prefilterShader.activate();
+    prefilterShader.setInt("environmentMap", 0);
+    prefilterShader.setMat("proj", captureProjection);
     base_pbrShader.activate();
     base_pbrShader.setVec("albedo", 0.5f, 0.0f, 0.0f);
     base_pbrShader.setFloat("ao", 1.0f);
@@ -76,8 +85,6 @@ int main()
 
     Framebuffer captureFbo;
     uint32_t rbo = captureFbo.genRenderbuffer();
-    captureFbo.activate();
-    captureFbo.setRenderbufferSize(rbo, 512, 512);
     captureFbo.genAttachmentR(rbo);
 
     Texture hdrTexture;
@@ -102,14 +109,12 @@ int main()
     Texture ao_titanium;
     ao_titanium.loadTexture("resources/textures/worn-shiny-metal-ao.png");
 
-    equirectanglarToCubemapShader.activate();
-    equirectanglarToCubemapShader.setInt("equirectangularMap", 0);
-    equirectanglarToCubemapShader.setMat("proj", captureProjection);
-    hdrTexture.activate(0);
-
-    mainWindow->setWindowSize(512, 512);
-
     captureFbo.activate();
+
+    equirectanglarToCubemapShader.activate();
+    hdrTexture.activate(0);
+    mainWindow->setWindowSize(512, 512);
+    captureFbo.setRenderbufferSize(rbo, 512, 512);
     for (int i = 0; i < 6; ++i) {
         equirectanglarToCubemapShader.setMat("view", captureViews[i]);
         captureFbo.genAttachmentT(TextureType::Cube, envCubemap.getId(), i);
@@ -118,16 +123,10 @@ int main()
         drawManager.drawCube(cubeVao);
     }
 
-    captureFbo.activate();
-    captureFbo.setRenderbufferSize(rbo, 32, 32);
-
     irradianceShader.activate();
-    irradianceShader.setInt("environmentMap", 0);
-    irradianceShader.setMat("proj", captureProjection);
     envCubemap.activate(0);
-
     mainWindow->setWindowSize(32, 32);
-
+    captureFbo.setRenderbufferSize(rbo, 32, 32);
     for (int i = 0; i < 6; ++i) {
         irradianceShader.setMat("view", captureViews[i]);
         captureFbo.genAttachmentT(TextureType::Cube, irradianceMap.getId(), i);
@@ -137,17 +136,12 @@ int main()
     }
 
     prefilterShader.activate();
-    prefilterShader.setInt("environmentMap", 0);
-    prefilterShader.setMat("proj", captureProjection);
     envCubemap.activate(0);
-
-    captureFbo.activate();
     for (int mip = 0, maxMipLevels = 5; mip < maxMipLevels; ++mip) {
         uint32_t mipWidth = static_cast<uint32_t>(128 * std::pow(0.5, mip));
         uint32_t mipHeight = static_cast<uint32_t>(128 * std::pow(0.5, mip));
-        captureFbo.setRenderbufferSize(rbo, mipWidth, mipHeight);
-
         mainWindow->setWindowSize(mipWidth, mipHeight);
+        captureFbo.setRenderbufferSize(rbo, mipWidth, mipHeight);
 
         float roughness = static_cast<float>(mip) / static_cast<float>(maxMipLevels - 1);
         prefilterShader.setFloat("roughness", roughness);
@@ -160,22 +154,16 @@ int main()
         }
     }
 
-    captureFbo.activate();
+    brdfShader.activate();
+    mainWindow->setWindowSize(512, 512);
+    mainWindow->setState(StateType::Buffer, 0);
     captureFbo.setRenderbufferSize(rbo, 512, 512);
     captureFbo.genAttachmentT(TextureType::_2D, brdfLUTTexture.getId());
-
-    mainWindow->setWindowSize(512, 512);
-    
-    brdfShader.activate();
-    mainWindow->setState(StateType::Buffer, 0);
 
     drawManager.drawQuad(quadVao);
 
     Framebuffer::reset();
-
-    backgroundShader.activate();
-    backgroundShader.setMat("proj", mCamera->getProjMatrix());
-
+    
     mainWindow->setWindowSize(windowWidth, windowHeight);
 
     Shader* curPBRShader = nullptr;
@@ -248,6 +236,7 @@ int main()
 
         backgroundShader.activate();
         backgroundShader.setMat("view", view);
+        backgroundShader.setMat("proj", proj);
         envCubemap.activate(0);
         //irradianceMap.activate(0);
         //prefilterMap.activate(0);

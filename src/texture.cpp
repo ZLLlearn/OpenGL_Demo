@@ -49,19 +49,19 @@ void Texture::genTexture(uint32_t width, uint32_t height, bool mipmap, uint32_t 
         format = GL_RGBA;
     }
     
-    glBindTexture(convertType(m_type), m_id);
+    uint32_t type = convertType(m_type);
+    glBindTexture(type, m_id);
     bool isLoad = m_data && mipmap;
     if (m_type == TextureType::_2D) {
-        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, isLoad ? GL_UNSIGNED_BYTE : GL_FLOAT, m_data);
+        glTexImage2D(type, 0, format, width, height, 0, format, isLoad ? GL_UNSIGNED_BYTE : GL_FLOAT, m_data);
     }
     else {
         for (int i = 0; i < 6; ++i) {
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, width, height, 0, format, GL_FLOAT, m_data);
         }
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+        glTexParameteri(type, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
     }
 
-    uint32_t type = convertType(m_type);
     glTexParameteri(type, GL_TEXTURE_WRAP_S, isLoad ? GL_REPEAT : GL_CLAMP_TO_EDGE);
     glTexParameteri(type, GL_TEXTURE_WRAP_T, isLoad ? GL_REPEAT : GL_CLAMP_TO_EDGE);
     glTexParameteri(type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
