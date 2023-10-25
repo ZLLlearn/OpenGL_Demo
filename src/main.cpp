@@ -166,8 +166,7 @@ int main()
     
     mainWindow->setWindowSize(windowWidth, windowHeight);
 
-    Shader* curPBRShader = nullptr;
-    curPBRShader = &IBLTexture_pbrShader;
+    Shader* curPBRShader = &IBLTexture_pbrShader;
 
     while (mainWindow->paint()) {
         mainWindow->processInput(inputManager);
