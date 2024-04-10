@@ -16,6 +16,7 @@ int main()
     mainWindow->activateContext();
 
     auto& drawManager = DrawManager::getDrawManager();
+    auto lineVao = drawManager.initVAO();
     auto trangleVao = drawManager.initVAO();
     auto quadVao = drawManager.initVAO();
     auto cubeVao = drawManager.initVAO();
@@ -41,6 +42,9 @@ int main()
 
     Shader base_2DShader("resources/shaderCodes/2D_base_vs.glsl", "resources/shaderCodes/2D_base_fs.glsl");
     Shader base_3DShader("resources/shaderCodes/3D_base_vs.glsl", "resources/shaderCodes/3D_base_fs.glsl");
+    Shader test_geometry_2DShader("resources/shaderCodes/2D_base_vs.glsl", "resources/shaderCodes/2D_base_fs.glsl", "resources/shaderCodes/2D_genTriangles_gs.glsl");
+    Shader test_geometry_line_2DShader("resources/shaderCodes/2D_base_vs.glsl", "resources/shaderCodes/2D_base_fs.glsl", "resources/shaderCodes/2D_genLines_gs.glsl");
+    Shader test_geometry_3DShader("resources/shaderCodes/3D_base_vs.glsl", "resources/shaderCodes/3D_base_fs.glsl", "resources/shaderCodes/3D_genTriangles_gs.glsl");
     Shader texture_2DShader("resources/shaderCodes/2D_texture_vs.glsl", "resources/shaderCodes/2D_texture_fs.glsl");
     Shader base_pbrShader("resources/shaderCodes/pbr_base_vs.glsl", "resources/shaderCodes/pbr_base_fs.glsl");
     Shader IBL_pbrShader("resources/shaderCodes/pbr_base_vs.glsl", "resources/shaderCodes/pbr_IBL_fs.glsl");
@@ -175,6 +179,12 @@ int main()
 
         //base_2DShader.activate();
         //drawManager.drawTriangle(trangleVao);
+
+        //test_geometry_2DShader.activate();
+        //drawManager.drawTriangle(trangleVao);
+
+        //test_geometry_line_2DShader.activate();
+        //drawManager.drawLine(lineVao);
 
         //base_3DShader.activate();
         //base_3DShader.setMat("model", glm::mat4(1.0f));

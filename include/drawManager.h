@@ -7,6 +7,7 @@ public:
     static DrawManager& getDrawManager();
 
     uint32_t initVAO() const;
+    void drawLine(uint32_t& id);
     void drawTriangle(uint32_t& id);
     void drawQuad(uint32_t& id);
     void drawCube(uint32_t& id);

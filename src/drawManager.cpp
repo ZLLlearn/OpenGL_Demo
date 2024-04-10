@@ -22,13 +22,47 @@ uint32_t DrawManager::initVAO() const {
     return 0;
 }
 
+void DrawManager::drawLine(uint32_t& id) {
+    if (id == 0) {
+        float linev[] = {
+        // positions         // colors
+         0.2f, -0.2f, 0.0f,  1.0f, 0.0f, 0.0f,  // bottom right
+        -0.2f, -0.2f, 0.0f,  0.0f, 1.0f, 0.0f,  // bottom left
+        };
+
+        glGenVertexArrays(1, &id);
+
+        uint32_t vbo;
+        glGenBuffers(1, &vbo);
+
+        glBindVertexArray(id);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(linev), linev, GL_STATIC_DRAW);
+
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(1);
+
+        vaoIds.push_back(id);
+        vboIds.push_back(vbo);
+    }
+
+    glBindVertexArray(id);
+    glDrawArrays(GL_LINES, 0, 2);
+    glBindVertexArray(0);
+}
+
 void DrawManager::drawTriangle(uint32_t& id) {
     if (id == 0) {
         float trianglev[] = {
         // positions         // colors
-         1.0f, -1.0f, 0.0f,  1.0f, 0.0f, 0.0f,  // bottom right
-        -1.0f, -1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  // bottom left
-         0.0f,  1.0f, 0.0f,  0.0f, 0.0f, 1.0f   // top 
+         0.2f, -0.2f, 0.0f,  1.0f, 0.0f, 0.0f,  // bottom right
+        -0.2f, -0.2f, 0.0f,  0.0f, 1.0f, 0.0f,  // bottom left
+         0.0f,  0.2f, 0.0f,  0.0f, 0.0f, 1.0f,   // top 
+         0.8f,  0.4f, 0.0f,  1.0f, 0.0f, 0.0f,  // bottom right
+         0.4f,  0.4f, 0.0f,  0.0f, 1.0f, 0.0f,  // bottom left
+         0.6f,  0.8f, 0.0f,  0.0f, 0.0f, 1.0f   // top 
         };
 
         glGenVertexArrays(1, &id);
@@ -50,7 +84,7 @@ void DrawManager::drawTriangle(uint32_t& id) {
     }
 
     glBindVertexArray(id);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
 }
 
